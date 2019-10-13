@@ -1,32 +1,4 @@
-// Function to determine marker size based on earthquake magnitude
-function markerSize(responseFeature) {
-  return Math.sqrt(Math.abs(responseFeature.properties.mag)) * 5;
-}
 
-
-// Function to determine marker color based on earthquake magnitude
-var colors = ["#7FFF00", "#dfedbe", "#eede9f", "#FF8C00", "	#FA8072", "#FF0000"]
-function fillColor(responseFeature) {
-  var mag = responseFeature.properties.mag;
-  if (mag <= 1) {
-    return colors[0]
-  }
-  else if (mag <= 2) {
-    return colors[1]
-  }
-  else if (mag <= 3) {
-    return colors[2]
-  }
-  else if (mag <= 4) {
-    return colors[3]
-  }
-  else if (mag <= 5) {
-    return colors[4]
-  }
-  else {
-    return colors[5]
-  }
-}
 
 var attribution = "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>";
    
@@ -87,57 +59,95 @@ L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
 d3.json(queryUrl, function(response) {
     console.log(response);
     createFeatures(response.features) 
-    });
-    function createFeatures(data) {
-      console.log(data);
-      // Create a new marker cluster group
-      var markers = L.markerClusterGroup();
-    
-      // Loop through data
-      for (var i = 0; i < data.length; i++) {
-        console.log( data[i].geometry)
-        // Set the data location property to a variable
-        var features = data;
-       // console.log(features)
-        var lat =data[i].geometry.coordinates[0];
-        var lng = data[i].geometry.coordinates[1];
-        // Check for feature property
-        if (features) {
-    
-          // Add a new marker to the cluster group and bind a pop-up
-          markers.addLayer(L.circleMarker([lng, lat], {
-             color: "white",
-             fillColor: fillColor(data[i]),//"#f03",
-             fillOpacity: 0.8,
-             radius: markerSize(data[i])
-          })
-           // .bindPopup(data[i].properties.place));
-            .bindPopup(`<strong>Place:</strong> ${data[i].properties.place}<br><strong>Magnitude:</strong> ${data[i].properties.mag}`));
-        }
-    
-      }
-    
-  
-    // Add our marker cluster layer to the map
-    myMap.addLayer(markers);
-    
-    // Add the layer control to the map
-    L.control.layers(baseMaps, satelliteMap, {
-      collapsed: false
-    }).addTo(map);
-    
-    // Create a legend to display information about our map
-    var info = L.control({
-      position: "bottomright"
-    });
+   });
 
-    // When the layer control is added, insert a div with the class of "legend"
-    info.onAdd = function() {
-      var div = L.DomUtil.create("div", "legend");
-      return div;
-    };
-    // Add the info legend to the map
-    info.addTo(map);
+function createFeatures(data) {
+  console.log(data);
+  // Create a new marker cluster group
+  var markers = L.markerClusterGroup();
 
-    
+  // Loop through data
+  for (var i = 0; i < data.length; i++) {
+    console.log( data[i].geometry)
+    var features = data;
+    // console.log(features)
+    var lat =data[i].geometry.coordinates[0];
+    var lng = data[i].geometry.coordinates[1];
+    // Check for feature property
+    if (features) {
+      // Add a new marker to the cluster group and bind a pop-up
+      markers.addLayer(L.circleMarker([lng, lat], {
+          color: "white",
+          fillColor: fillColor(data[i]),//"#f03",
+          fillOpacity: 0.8,
+          radius: markerSize(data[i])
+      })
+        // .bindPopup(data[i].properties.place));
+        .bindPopup(`<strong>Place:</strong> ${data[i].properties.place}<br><strong>Magnitude:</strong> ${data[i].properties.mag}`));
+    }
+
   }
+    
+
+  // Add our marker cluster layer to the map
+  myMap.addLayer(markers);
+  
+  // Add the layer control to the map
+  /*L.control.layers(baseMaps, satelliteMap, {
+    collapsed: false
+  }).addTo(myMap);
+  */
+  // Create a legend to display information about our map
+  var info = L.control({
+    position: "bottomright"
+  });
+
+  // When the layer control is added, insert a div with the class of "legend"
+  info.onAdd = function() {
+    var div = L.DomUtil.create("div", "legend");
+    mag = [" 0 - 1 ", " 1 - 2 ", " 2 - 3 "," 3 - 4 "," 4 - 5 ", " 5+  " ]
+    
+  // loop through the magnitude and generate a label with a colored square for each interval
+  for (var i = 0; i < mag.length; i++) {
+      div.innerHTML +=
+          '<i style="background:' + colors[i] + '">' + mag[i] + '</i>' + '<br>';
+  }
+    return div;
+  };
+
+  // Add the info legend to the map
+  info.addTo(myMap);
+
+}
+
+
+
+// Function to determine marker size based on earthquake magnitude
+function markerSize(responseFeature) {
+  return Math.sqrt(Math.abs(responseFeature.properties.mag)) * 5;
+}
+
+
+// Function to determine marker color based on earthquake magnitude
+var colors = ["#7FFF00", "#dfedbe", "#eede9f", "#FF8C00", "	#FA8072", "#FF0000"]
+function fillColor(responseFeature) {
+  var mag = responseFeature.properties.mag;
+  if (mag <= 1) {
+    return colors[0]
+  }
+  else if (mag <= 2) {
+    return colors[1]
+  }
+  else if (mag <= 3) {
+    return colors[2]
+  }
+  else if (mag <= 4) {
+    return colors[3]
+  }
+  else if (mag <= 5) {
+    return colors[4]
+  }
+  else {
+    return colors[5]
+  }
+}
